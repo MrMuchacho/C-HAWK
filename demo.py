@@ -48,71 +48,70 @@ def main():
     running = True
    
     while running:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
-            elif event.type == pygame.KEYUP:
-                drone.hover()
-            elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
+        key=waitKey(15)
+           
+                if key==27: #Escape
                     drone.reset()
                     running = False
                 # takeoff / land
-                elif event.key == pygame.K_RETURN:
+                elif key==13:#Return
                     print("return")
                     drone.takeoff()
-                elif event.key == pygame.K_SPACE:
+                elif key==32:#space
                     print("space")
                     drone.land()
                 # emergency
-                elif event.key == pygame.K_BACKSPACE:
+                elif key==8:#backspace
                     drone.reset()
                 # forward / backward
-                elif event.key == pygame.K_w:
+                elif key==ord('w'):#w
                     drone.move_forward()
-                elif event.key == pygame.K_s:
+                elif key==ord('s'):#s
                     drone.move_backward()
                 # left / right
-                elif event.key == pygame.K_a:
+                elif key==ord('a'):#a
                     drone.move_left()
-                elif event.key == pygame.K_d:
+                elif key==ord('d'):#d
                     drone.move_right()
                 # up / down
-                elif event.key == pygame.K_UP:
+                elif key==63232:#up
                     drone.move_up()
-                elif event.key == pygame.K_DOWN:
+                elif key==63233:#down
                     drone.move_down()
                 # turn left / turn right
-                elif event.key == pygame.K_LEFT:
+                elif key==63234:#left
                     drone.turn_left()
-                elif event.key == pygame.K_RIGHT:
+                elif key==63235:#right
                     drone.turn_right()
                 # speed
-                elif event.key == pygame.K_1:
+                elif key==ord('1'):#1
                     drone.speed = 0.1
-                elif event.key == pygame.K_2:
+                elif key==ord('2'):#2
                     drone.speed = 0.2
-                elif event.key == pygame.K_3:
+                elif key==ord('3'):#3
                     drone.speed = 0.3
-                elif event.key == pygame.K_4:
+                elif key==ord('4'):#4
                     drone.speed = 0.4
-                elif event.key == pygame.K_5:
+                elif key==ord('5'):#5
                     drone.speed = 0.5
-                elif event.key == pygame.K_6:
+                elif key==ord('6'):#6
                     drone.speed = 0.6
-                elif event.key == pygame.K_7:
+                elif key==ord('7'):#7
                     drone.speed = 0.7
-                elif event.key == pygame.K_8:
+                elif key==ord('8'):#8
                     drone.speed = 0.8
-                elif event.key == pygame.K_9:
+                elif key==ord('9'):#9
                     drone.speed = 0.9
-                elif event.key == pygame.K_0:
+                elif key==ord('0'):#0
                     drone.speed = 1.0
                     
-                elif event.key == pygame.K_v:
+                elif key==ord('v'):#v
                     drone.set_camera_view(False)
-                elif event.key == pygame.K_c:
+                elif key==ord('c'):#c
                     drone.set_camera_view(True)
+                    
+                else:
+                    drone.hover()
 
         try:
             # print pygame.image
