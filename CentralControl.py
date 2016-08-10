@@ -4,12 +4,14 @@ Created on Wed Aug 10 11:48:48 2016
 
 @author: Christian
 """
-import PIDController
+from PIDController import PID_Controller
 
 class CentralControl(object):
     
-    x_PIDController=PIDController(1,1,1,"xController")
-    y_PIDController=PIDController(1,1,1,"yController")
-    bf_PIDController=PIDController(1,1,1,"bfController")
+    print PID_Controller(1,1,1,"xController")
+    
+    x_PIDController=PID_Controller(1,1,1,"xController")
+    y_PIDController=PID_Controller(1,1,1,"yController")
+    bf_PIDController=PID_Controller(1,1,1,"bfController")
     
     
