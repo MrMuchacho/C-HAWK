@@ -20,6 +20,7 @@ def cornerPointsChess(img):
     gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY) 
     ret, corners = cv2.findChessboardCorners(gray, (NBR_COLUMNS,NBR_ROWS),None)
     
+    
     if ret == True:
         print "Chessboard found!"
         x1 = round(corners[0][0][0])
