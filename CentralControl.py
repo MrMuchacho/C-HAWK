@@ -8,12 +8,13 @@ from PIDController import PID_Controller
 from libardrone import libardrone
 import patternRecognition 
 import time
+import cv2
 
 class CentralControl(object):
     
-    x_PIDController=PID_Controller(1,1,1,"xController")
-    y_PIDController=PID_Controller(1,1,1,"yController")
-    bf_PIDController=PID_Controller(1,1,1,"bfController")
+    x_PIDController=PID_Controller(1,0.1,2,"xController")
+    y_PIDController=PID_Controller(1.5,0.1,2.25,"yController")
+    bf_PIDController=PID_Controller(1,0.1,2.25,"bfController")
     
     
     
@@ -43,13 +44,35 @@ class CentralControl(object):
     def controlLoop(self):
         drone=libardrone.ARDrone(True)        
         drone.reset()
+        drone.speed = 0.1
+#        waiting = True
+
+#        while waiting:
+#            key=cv2.waitKey(1000)
+#            if key==32:
+#                waiting = False
+#                print "End Waiting"  
+#                 
+#            else:
+#                print "Waiting"
+#                print "Key: "+str(key)
+#                time.sleep(1)
+        frame=drone.get_image()
+        cv2.imshow('img',frame)
+        print "Draw Image"
+        cv2.waitKey(0)
         
-       # self.drone.takeoff()
+#        print "Key: "+str(key)
+        drone.takeoff()
+        print "Takeoff"
         
         running=True
         counter=0
         while counter<3000:#running:
-        
+            key=cv2.waitKey(5)
+            if key==32:
+                drone.land()
+            
             frame=drone.get_image()
             
         # call imageRec
@@ -63,11 +86,18 @@ class CentralControl(object):
                 x_PIDValue=self.x_PIDController.pidControl(self.standardXCoord,xAvg)
                 y_PIDValue=self.y_PIDController.pidControl(self.standardYCoord,yAvg)
                 bf_PIDValue=self.bf_PIDController.pidControl(self.standardSize,currentsize)
+                print "x_PID: "+str(x_PIDValue)
+                print "y_PID: "+str(y_PIDValue)
+                print "bf_PID: "+str(bf_PIDValue)
             # Actuate
-                self.actuateX(x_PIDValue)
-                self.actuateY(y_PIDValue)
-                self.actuateBF(bf_PIDValue)
-                break
+                maxPIDValue = max(abs(x_PIDValue),abs(y_PIDValue),abs(bf_PIDValue))
+#                self.actuateX(x_PIDValue,drone)
+                if abs(x_PIDValue)==abs(maxPIDValue):
+                    self.actuateX(x_PIDValue,drone)
+                elif abs(y_PIDValue)==abs(maxPIDValue):
+                    self.actuateY(y_PIDValue,drone)
+                else:
+                    self.actuateBF(bf_PIDValue,drone)
             else:
                 #drone.hover()
                 pass
@@ -84,17 +114,44 @@ class CentralControl(object):
         print("Ok.")
             
         
-    def actuateX(self, x_PIDValue):
-        pass
+    def actuateX(self, x_PIDValue,drone):
+        drone.speed = 0.1
+        if x_PIDValue>0:
+            print "Turn left"
+            drone.turn_left()
+        elif x_PIDValue<0:
+            print "Turn right"
+            drone.turn_right()
+        else:
+            pass
+        time.sleep(0.1)
 
-    def actuateY(self, y_PIDValue):
-        pass
+    def actuateY(self, y_PIDValue,drone):
+        drone.speed = 0.1
+        if y_PIDValue>0:
+            print "Move up"
+            drone.move_up()
+        elif y_PIDValue<0:
+            print "Move down"
+            drone.move_down()
+        else:
+            pass
+        time.sleep(0.1)
         
-    def actuateBF(self, bf_PIDValue):
-        pass
+    def actuateBF(self, bf_PIDValue,drone):
+        drone.speed = 0.1
+        if bf_PIDValue>0:
+            print "Move forward"
+            drone.move_forward()
+        elif bf_PIDValue<0:
+            print "Move backward"
+            drone.move_backward()
+        else:
+            pass
+        time.sleep(0.1)
         
 
-control=CentralControl(320,180,115)
+control=CentralControl(320,180,80)     #115
 control.controlLoop()
         
         

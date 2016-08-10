@@ -20,7 +20,7 @@ def cornerPointsChess(img):
     gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY) 
     ret, corners = cv2.findChessboardCorners(gray, (NBR_COLUMNS,NBR_ROWS),None)
     
-    print corners
+#    print corners
     
     xalt=[]
     yalt=[]
@@ -40,11 +40,9 @@ def cornerPointsChess(img):
         yalt.append(round(corners[(NBR_COLUMNS-1)*NBR_ROWS][0][1]))    
         for i in range(0, 4):
             sumV.append(xalt[i] + yalt[i])
-            print "Sum: "+str(sumV)
         minV = min(sumV)
-        print "Min: "+str(minV)
         maxV = max(sumV)
-        print "Max: "+str(maxV)
+        print "Sum: "+str(sumV)
         for i in range(0, 4):
             if minV==sumV[i]:
                 x1 = xalt[i]; y1 = yalt[i]
