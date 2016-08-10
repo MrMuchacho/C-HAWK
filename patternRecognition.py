@@ -38,11 +38,14 @@ def cornerPointsChess(img):
         yalt.append(round(corners[NBR_COLUMNS*NBR_ROWS-1][0][1]))
         xalt.append(round(corners[(NBR_COLUMNS-1)*NBR_ROWS][0][0]))
         yalt.append(round(corners[(NBR_COLUMNS-1)*NBR_ROWS][0][1]))    
-        for i in range(0, 3):
+        for i in range(0, 4):
             sumV.append(xalt[i] + yalt[i])
+            print "Sum: "+str(sumV)
         minV = min(sumV)
+        print "Min: "+str(minV)
         maxV = max(sumV)
-        for i in range(0, 3):
+        print "Max: "+str(maxV)
+        for i in range(0, 4):
             if minV==sumV[i]:
                 x1 = xalt[i]; y1 = yalt[i]
             if maxV==sumV[i]:
