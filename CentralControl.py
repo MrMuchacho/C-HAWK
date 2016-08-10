@@ -6,7 +6,8 @@ Created on Wed Aug 10 11:48:48 2016
 """
 from PIDController import PID_Controller
 import libardrone
-import patternRecognition
+import patternRecognition 
+import time
 
 class CentralControl(object):
     
@@ -14,7 +15,7 @@ class CentralControl(object):
     y_PIDController=PID_Controller(1,1,1,"yController")
     bf_PIDController=PID_Controller(1,1,1,"bfController")
     
-    drone=libardrone.ARDrone(True)
+    
     
     #imgrecognition class
     
@@ -42,34 +43,46 @@ class CentralControl(object):
         return ((xCoordinate_leftUpperCorner-xCoordinate_rightDownerCorner)**2+(yCoordinate_leftUpperCorner-yCoordinate_rightDownerCorner)**2)**0.5
     
     def controlLoop(self):
-        self.drone.reset()
+        drone=libardrone.ARDrone(True)        
+        drone.reset()
         
-        self.drone.takeoff()
+       # self.drone.takeoff()
         
         running=True
-        while running:
-            frame=self.drone.get_image()
+        counter=0
+        while counter<3000:#running:
+        
+            frame=drone.get_image()
             
         # call imageRec
             xlu,ylu,xrd,yrd=patternRecognition.cornerPointsChess(frame)
-        # computeSize
-            currentsize=self.computeSize(xlu,ylu,xrd,yrd)
-        # call PIDController
-            x_PIDValue=self.x_PIDController.pidControl(self.standardXCoordLU,xlu)
-            y_PIDValue=self.y_PIDController.pidControl(self.standardYCoordLU,ylu)
-            bf_PIDValue=self.bf_PIDController.pidControl(self.standardSize,currentsize)
-        # Actuate
-            self.actuateX(x_PIDValue)
-            self.actuateY(y_PIDValue)
-            self.actuateBF(bf_PIDValue)
+            if not(xlu==-1 and ylu==-1 and xrd==-1 and yrd==-1):    
+            # computeSize
+                currentsize=self.computeSize(xlu,ylu,xrd,yrd)
+            # call PIDController
+                x_PIDValue=self.x_PIDController.pidControl(self.standardXCoordLU,xlu)
+                y_PIDValue=self.y_PIDController.pidControl(self.standardYCoordLU,ylu)
+                bf_PIDValue=self.bf_PIDController.pidControl(self.standardSize,currentsize)
+            # Actuate
+                self.actuateX(x_PIDValue)
+                self.actuateY(y_PIDValue)
+                self.actuateBF(bf_PIDValue)
+            
+            else:
+                #drone.hover()
+                pass
+            
+            counter+=1
+            
+            time.sleep(0.01)
 
-    drone.land()    
-    print "Drone landed"     
-     
-    print("Shutting down...")
-    drone.halt()
-    print("Ok.")
-        
+        #drone.land()    
+        print "Drone landed"     
+         
+        print("Shutting down...")
+        drone.halt()
+        print("Ok.")
+            
         
     def actuateX(self, x_PIDValue):
         pass
@@ -80,7 +93,9 @@ class CentralControl(object):
     def actuateBF(self, bf_PIDValue):
         pass
         
-        
+
+control=CentralControl(50,50,300,300)
+control.controlLoop()
         
         
     
