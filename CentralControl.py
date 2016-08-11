@@ -66,6 +66,9 @@ class CentralControl(object):
         drone.takeoff()
         print "Takeoff"
         
+        logFilePIDPath="logFilePID.log"
+        logFilePID=open(logFilePIDPath,"a")
+        
         running=True
         counter=0
         while counter<3000:#running:
@@ -89,6 +92,8 @@ class CentralControl(object):
                 print "x_PID: "+str(x_PIDValue)
                 print "y_PID: "+str(y_PIDValue)
                 print "bf_PID: "+str(bf_PIDValue)
+                
+                self.logFileWrite(logFilePID,str(x_PIDValue))
             # Actuate
                 maxPIDValue = max(abs(x_PIDValue),abs(y_PIDValue),abs(bf_PIDValue))
 #                self.actuateX(x_PIDValue,drone)
@@ -105,7 +110,10 @@ class CentralControl(object):
             counter+=1
             
             time.sleep(0.01)
+            
 
+        logFilePID.close    
+    
         #drone.land()    
         print "Drone landed"     
          
@@ -149,7 +157,24 @@ class CentralControl(object):
         else:
             pass
         time.sleep(0.1)
+       
+    def logFileWrite(self,file,msg):
+        file.write("%s,%s\n" % (str(time.time()), msg))
         
+  #  logfile = '/var/log/logfile.log'
+
+## function to save log messages to specified log file
+#def log(msg):
+#
+#  # open the specified log file
+#  file = open(logfile,"a")
+#
+#  # write log message with timestamp to log file
+#  file.write("%s: %s\n" % (time.strftime("%d.%m.%Y %H:%M:%S"), msg))
+#
+#  # close log file
+#  file.close
+
 
 control=CentralControl(320,180,80)     #115
 control.controlLoop()
