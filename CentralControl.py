@@ -17,8 +17,8 @@ class CentralControl(object):
     y_PIDController=PID_Controller(1.5,0.0,2.25,"yController")
     bf_PIDController=PID_Controller(1,0.0,3,"bfController")
     
-    speedRange = [0.15,0.15,0.15]
-    maxPIDValue = [100,200,200]
+    speedRange = [0.15,0.15,0.15,0.05]  #turn x, move y, go forward, move x
+    maxPIDValue = [100,200,200,100]
     
     #imgrecognition class
     
@@ -122,8 +122,8 @@ class CentralControl(object):
 #                else:
 #                    self.actuateBF(bf_PIDValue,drone)
                     
-                xSpeed,ySpeed,bfSpeed = self.calcSpeed(x_PIDValue,y_PIDValue,bf_PIDValue)
-                self.actuateAll(xSpeed,ySpeed,bfSpeed,drone)
+                xSpeed,ySpeed,bfSpeed,x2Speed = self.calcSpeed(x_PIDValue,y_PIDValue,bf_PIDValue)
+                self.actuateAll(x2Speed,xSpeed,ySpeed,bfSpeed,drone)
             else:
                 #drone.hover()
                 pass
@@ -134,7 +134,7 @@ class CentralControl(object):
             
 
         logFilePID.close    
-    
+        logFileCmd.close
         #drone.land()    
         print "Drone landed"     
          
@@ -195,12 +195,17 @@ class CentralControl(object):
             bfSpeed=-np.sign(bf_PIDValue)*self.speedRange[2]
         else:
             bfSpeed=-bf_PIDValue/self.maxPIDValue[2]*self.speedRange[2]
-        return xSpeed,ySpeed,bfSpeed
+        # x-speed: change sign PIDValue>0 <=> speed<0
+        if abs(x_PIDValue)>self.maxPIDValue[3]:        
+            x2Speed=-np.sign(x_PIDValue)*self.speedRange[3]
+        else:
+            x2Speed=-x_PIDValue/self.maxPIDValue[3]*self.speedRange[3]
+        return xSpeed,ySpeed,bfSpeed,x2Speed
         
         
-    def actuateAll(self,xSpeed,ySpeed,bfSpeed,drone):
+    def actuateAll(self,x2Speed,xSpeed,ySpeed,bfSpeed,drone):
         print "z-Speed:"+str(-bfSpeed)+", x-Speed: "+str(xSpeed)+", y-Speed: "+str(ySpeed)
-        drone.at(libardrone.at_pcmd, True, 0, bfSpeed, ySpeed, xSpeed)
+        drone.at(libardrone.at_pcmd, True, x2Speed, bfSpeed, ySpeed, xSpeed)
        
     def logFileWrite(self,file,msg):
         file.write("%s,%s\n" % (str(time.time()), msg))
