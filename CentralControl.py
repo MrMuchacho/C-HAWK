@@ -74,12 +74,12 @@ class CentralControl(object):
         drone.takeoff()
         print "Takeoff"
         
-        logFilePIDPath="logFilePID_02.log"
+        logFilePIDPath="logFilePID_03.log"
         logFilePID=open(logFilePIDPath,"a")
-        logFileCmdPath="logFileCmd_02.log"
+        logFileCmdPath="logFileCmd_03.log"
         logFileCmd=open(logFileCmdPath,"a")
 
-        logFilePID.write("\n\n=================================================================================\n")
+#        logFilePID.write("\n\n=================================================================================\n")
         logFileCmd.write("\n\n=================================================================================\n")
         
         running=True
