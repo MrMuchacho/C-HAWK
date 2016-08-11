@@ -9,14 +9,16 @@ from libardrone import libardrone
 import patternRecognition 
 import time
 import cv2
+import numpy as np
 
 class CentralControl(object):
     
-    x_PIDController=PID_Controller(1,0.1,2,"xController")
-    y_PIDController=PID_Controller(1.5,0.1,2.25,"yController")
-    bf_PIDController=PID_Controller(1,0.1,2.25,"bfController")
+    x_PIDController=PID_Controller(1,0.0,2.5,"xController")
+    y_PIDController=PID_Controller(1.5,0.0,2.25,"yController")
+    bf_PIDController=PID_Controller(1,0.0,3,"bfController")
     
-    
+    speedRange = [0.15,0.15,0.15]
+    maxPIDValue = [100,200,200]
     
     #imgrecognition class
     
@@ -50,7 +52,7 @@ class CentralControl(object):
     def controlLoop(self):
         drone=libardrone.ARDrone(True)        
         drone.reset()
-        drone.speed = 0.1
+#        drone.speed = 0.1
 #        waiting = True
 
 #        while waiting:
@@ -112,12 +114,15 @@ class CentralControl(object):
             # Actuate
                 maxPIDValue = max(abs(x_PIDValue),abs(y_PIDValue),abs(bf_PIDValue))
 #                self.actuateX(x_PIDValue,drone)
-                if abs(x_PIDValue)==abs(maxPIDValue):
-                    self.actuateX(x_PIDValue,drone)
-                elif abs(y_PIDValue)==abs(maxPIDValue):
-                    self.actuateY(y_PIDValue,drone)
-                else:
-                    self.actuateBF(bf_PIDValue,drone)
+#                if abs(x_PIDValue)==abs(maxPIDValue):
+#                    self.actuateX(x_PIDValue,drone)
+#                elif abs(y_PIDValue)==abs(maxPIDValue):
+#                    self.actuateY(y_PIDValue,drone)
+#                else:
+#                    self.actuateBF(bf_PIDValue,drone)
+                    
+                xSpeed,ySpeed,bfSpeed = self.calcSpeed(x_PIDValue,y_PIDValue,bf_PIDValue)
+                self.actuateAll(xSpeed,ySpeed,bfSpeed,drone)
             else:
                 #drone.hover()
                 pass
@@ -172,9 +177,29 @@ class CentralControl(object):
         else:
             pass
         time.sleep(0.1)
+
+    def calcSpeed(self,x_PIDValue,y_PIDValue,bf_PIDValue):
+        # x-speed: change sign PIDValue>0 <=> speed<0
+        if abs(x_PIDValue)>self.maxPIDValue[0]:        
+            xSpeed=-np.sign(x_PIDValue)*self.speedRange[0]
+        else:
+            xSpeed=-x_PIDValue/self.maxPIDValue[0]*self.speedRange[0]
+        # y-speed: keep sign PIDValue>0 <=> speed>0
+        if abs(y_PIDValue)>self.maxPIDValue[1]:        
+            ySpeed=np.sign(y_PIDValue)*self.speedRange[1]
+        else:
+            ySpeed=y_PIDValue/self.maxPIDValue[1]*self.speedRange[1]
+        # bf-speed: change sign PIDValue>0 <=> speed<0
+        if abs(bf_PIDValue)>self.maxPIDValue[2]:        
+            bfSpeed=-np.sign(bf_PIDValue)*self.speedRange[2]
+        else:
+            bfSpeed=-bf_PIDValue/self.maxPIDValue[2]*self.speedRange[2]
+        return xSpeed,ySpeed,bfSpeed
         
-    def actuateAll(self,xSpeed,ySpeed,bfSpeed,dron):
-        drone.at(at_pcmd, True, 0, -self.speed, 0, 0)
+        
+    def actuateAll(self,xSpeed,ySpeed,bfSpeed,drone):
+        print "z-Speed:"+str(-bfSpeed)+", x-Speed: "+str(xSpeed)+", y-Speed: "+str(ySpeed)
+        drone.at(libardrone.at_pcmd, True, 0, bfSpeed, ySpeed, xSpeed)
        
     def logFileWrite(self,file,msg):
         file.write("%s,%s\n" % (str(time.time()), msg))
