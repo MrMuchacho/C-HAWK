@@ -5,7 +5,7 @@ Created on Wed Aug 10 11:48:48 2016
 @author: Christian
 """
 from PIDController import PID_Controller
-from libardrone import libardrone
+import libardrone
 import patternRecognition 
 import time
 import cv2
@@ -17,8 +17,9 @@ class CentralControl(object):
     y_PIDController=PID_Controller(1.5,0.0,2.25,"yController")
     bf_PIDController=PID_Controller(1,0.0,3,"bfController")
     
-    speedRange = [0.15,0.15,0.15,0.05]  #turn x, move y, go forward, move x
-    maxPIDValue = [100,200,200,100]
+    speedRange = [0.25,0.15,0.2,0.05]  #turn x, move y, go forward, move x      ## Stabile Werte [0.25,0.15,0.2,0.05]
+    maxPIDValue = [200,200,200,200]
+    x_offset=0.003
     
     #imgrecognition class
     
@@ -74,20 +75,21 @@ class CentralControl(object):
         drone.takeoff()
         print "Takeoff"
         
-        logFilePIDPath="logFilePID_03.log"
+        logFilePIDPath="logFilePID_11.csv"
         logFilePID=open(logFilePIDPath,"a")
-        logFileCmdPath="logFileCmd_03.log"
+        logFileCmdPath="logFileCmd_11.csv"
         logFileCmd=open(logFileCmdPath,"a")
 
 #        logFilePID.write("\n\n=================================================================================\n")
         logFileCmd.write("\n\n=================================================================================\n")
         
         running=True
-        counter=0
-        while counter<3000:#running:
+        #counter=0
+        while running:#counter<3000:#running:
             key=cv2.waitKey(5)
             if key==32:
                 print "Land drone"
+                running=False
                 drone.land()
             
             frame=drone.get_image()
@@ -128,7 +130,7 @@ class CentralControl(object):
                 #drone.hover()
                 pass
             
-            counter+=1
+            #counter+=1
             
             time.sleep(0.01)
             
@@ -205,7 +207,7 @@ class CentralControl(object):
         
     def actuateAll(self,x2Speed,xSpeed,ySpeed,bfSpeed,drone):
         print "z-Speed:"+str(-bfSpeed)+", x-Speed: "+str(xSpeed)+", y-Speed: "+str(ySpeed)
-        drone.at(libardrone.at_pcmd, True, x2Speed, bfSpeed, ySpeed, xSpeed)
+        drone.at(libardrone.at_pcmd, True, x2Speed+self.x_offset, bfSpeed, ySpeed, xSpeed)
        
     def logFileWrite(self,file,msg):
         file.write("%s,%s\n" % (str(time.time()), msg))
