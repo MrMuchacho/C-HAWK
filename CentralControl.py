@@ -43,7 +43,7 @@ class CentralControl(object):
     
     def reciprocalSize(self,desiredValue,actualValue):
         if actualValue<desiredValue:
-            return (desiredValue**2)/actualValue
+            return 2*desiredValue-(desiredValue**2)/actualValue
         else:
             return actualValue
     
@@ -94,13 +94,13 @@ class CentralControl(object):
             if not(xlu==-1 and ylu==-1 and xrd==-1 and yrd==-1):    
             # computeSize
                 currentsize=self.computeSize(xlu,ylu,xrd,yrd)
-                recipSize = reciprocalSize(self.standardSize,currentsize)
+                recipSize = self.reciprocalSize(self.standardSize,currentsize)
                 xAvg = (xlu+xrd)/2.0
                 yAvg = (ylu+yrd)/2.0
             # call PIDController
                 x_PIDValue=self.x_PIDController.pidControl(self.standardXCoord,xAvg)
                 y_PIDValue=self.y_PIDController.pidControl(self.standardYCoord,yAvg)
-                bf_PIDValue=self.bf_PIDController.pidControl(self.standardSize,currentsize)
+                bf_PIDValue=self.bf_PIDController.pidControl(self.standardSize,recipSize)
                 print "x_PID: "+str(x_PIDValue)
                 self.logFileWrite(logFileCmd,"x_PID: "+str(x_PIDValue))
                 print "y_PID: "+str(y_PIDValue)
@@ -172,6 +172,9 @@ class CentralControl(object):
         else:
             pass
         time.sleep(0.1)
+        
+    def actuateAll(self,xSpeed,ySpeed,bfSpeed,dron):
+        drone.at(at_pcmd, True, 0, -self.speed, 0, 0)
        
     def logFileWrite(self,file,msg):
         file.write("%s,%s\n" % (str(time.time()), msg))
