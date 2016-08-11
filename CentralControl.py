@@ -41,6 +41,12 @@ class CentralControl(object):
     def computeSize(self,xCoordinate_leftUpperCorner,yCoordinate_leftUpperCorner,xCoordinate_rightDownerCorner,yCoordinate_rightDownerCorner):
         return ((xCoordinate_leftUpperCorner-xCoordinate_rightDownerCorner)**2+(yCoordinate_leftUpperCorner-yCoordinate_rightDownerCorner)**2)**0.5
     
+    def reciprocalSize(self,desiredValue,actualValue):
+        if actualValue<desiredValue:
+            return (desiredValue**2)/actualValue
+        else:
+            return actualValue
+    
     def controlLoop(self):
         drone=libardrone.ARDrone(True)        
         drone.reset()
@@ -70,6 +76,9 @@ class CentralControl(object):
         logFilePID=open(logFilePIDPath,"a")
         logFileCmdPath="logFileCmd.log"
         logFileCmd=open(logFileCmdPath,"a")
+
+        logFilePID.write("\n\n=================================================================================\n")
+        logFileCmd.write("\n\n=================================================================================\n")
         
         running=True
         counter=0
@@ -85,6 +94,7 @@ class CentralControl(object):
             if not(xlu==-1 and ylu==-1 and xrd==-1 and yrd==-1):    
             # computeSize
                 currentsize=self.computeSize(xlu,ylu,xrd,yrd)
+                recipSize = reciprocalSize(self.standardSize,currentsize)
                 xAvg = (xlu+xrd)/2.0
                 yAvg = (ylu+yrd)/2.0
             # call PIDController
@@ -98,7 +108,7 @@ class CentralControl(object):
                 print "bf_PID: "+str(bf_PIDValue)
                 self.logFileWrite(logFileCmd,"bf_PID: "+str(bf_PIDValue))
                 
-                self.logFileWrite(logFilePID,str(x_PIDValue))
+                self.logFileWrite(logFilePID,str(x_PIDValue)+","+str(y_PIDValue)+","+str(bf_PIDValue))
             # Actuate
                 maxPIDValue = max(abs(x_PIDValue),abs(y_PIDValue),abs(bf_PIDValue))
 #                self.actuateX(x_PIDValue,drone)
