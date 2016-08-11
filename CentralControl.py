@@ -5,7 +5,7 @@ Created on Wed Aug 10 11:48:48 2016
 @author: Christian
 """
 from PIDController import PID_Controller
-import libardrone
+from libardrone import libardrone
 import patternRecognition 
 import time
 import cv2
@@ -17,7 +17,7 @@ class CentralControl(object):
     y_PIDController=PID_Controller(1.5,0.0,2.25,"yController")
     bf_PIDController=PID_Controller(1,0.0,3,"bfController")
     
-    speedRange = [0.25,0.15,0.2,0.05]  #turn x, move y, go forward, move x      ## Stabile Werte [0.25,0.15,0.2,0.05]
+    speedRange = [0.35,0.15,0.3,0.1]  #turn x, move y, go forward, move x      ## Stabile Werte [0.25,0.15,0.2,0.05]
     maxPIDValue = [200,200,200,200]
     x_offset=0.003
     
@@ -127,7 +127,7 @@ class CentralControl(object):
                 xSpeed,ySpeed,bfSpeed,x2Speed = self.calcSpeed(x_PIDValue,y_PIDValue,bf_PIDValue)
                 self.actuateAll(x2Speed,xSpeed,ySpeed,bfSpeed,drone)
             else:
-                #drone.hover()
+                drone.hover()
                 pass
             
             #counter+=1
