@@ -7,12 +7,17 @@ This file provides functions to find well-defined patterns in an image
 
 import numpy as np
 import cv2
+import time
 
-def cornerPointsChess(img):
+def logFileWrite(file,msg):
+        file.write("%s,%s\n" % (str(time.time()), msg))
+
+def cornerPointsChess(img,logFile):
     """Find chessboard in image
     
     Args:
         img: An openCV image ndarray in a grayscale or color format.
+        logFile: File handler for logfile.
     """
     NBR_COLUMNS = 5
     NBR_ROWS = 5
@@ -26,6 +31,7 @@ def cornerPointsChess(img):
     
     if ret == True:
         print "Chessboard found!"
+        logFileWrite(logFile,"Chessboard found!")
         cv2.imwrite('testewr.png',img)
         #Find left-top corner value && right-bottom corner value
         xalt.append(round(corners[0][0][0]))
@@ -41,6 +47,7 @@ def cornerPointsChess(img):
         minV = min(sumV)
         maxV = max(sumV)
         print "Sum: "+str(sumV)
+        logFileWrite(logFile,"Sum: "+str(sumV))
         for i in range(0, 4):
             if minV==sumV[i]:
                 x1 = xalt[i]; y1 = yalt[i]
@@ -48,13 +55,14 @@ def cornerPointsChess(img):
                 x2 = xalt[i]; y2 = yalt[i]
         
         print "Endpoints: ("+str(x1)+","+str(y1)+") ; ("+str(x2)+","+str(y2)+")"
-    
+        logFileWrite(logFile,"Endpoints: ("+str(x1)+","+str(y1)+") ; ("+str(x2)+","+str(y2)+")")
         # Draw and display the corners (ADD FRAMES)
         cv2.drawChessboardCorners(img, (NBR_COLUMNS,NBR_ROWS), corners,ret)
 #        Draw ideal frame in the middle
 
     else:
         print "Chessboard not found!"
+        logFileWrite(logFile,"Chessboard not found!")
         x1=-1; y1=-1; x2=-1; y2=-1
         
     cv2.imshow('img',img)

@@ -68,6 +68,8 @@ class CentralControl(object):
         
         logFilePIDPath="logFilePID.log"
         logFilePID=open(logFilePIDPath,"a")
+        logFileCmdPath="logFileCmd.log"
+        logFileCmd=open(logFileCmdPath,"a")
         
         running=True
         counter=0
@@ -79,7 +81,7 @@ class CentralControl(object):
             frame=drone.get_image()
             
         # call imageRec
-            xlu,ylu,xrd,yrd=patternRecognition.cornerPointsChess(frame)
+            xlu,ylu,xrd,yrd=patternRecognition.cornerPointsChess(frame,logFileCmd)
             if not(xlu==-1 and ylu==-1 and xrd==-1 and yrd==-1):    
             # computeSize
                 currentsize=self.computeSize(xlu,ylu,xrd,yrd)
@@ -90,8 +92,11 @@ class CentralControl(object):
                 y_PIDValue=self.y_PIDController.pidControl(self.standardYCoord,yAvg)
                 bf_PIDValue=self.bf_PIDController.pidControl(self.standardSize,currentsize)
                 print "x_PID: "+str(x_PIDValue)
+                self.logFileWrite(logFileCmd,"x_PID: "+str(x_PIDValue))
                 print "y_PID: "+str(y_PIDValue)
+                self.logFileWrite(logFileCmd,"y_PID: "+str(y_PIDValue))
                 print "bf_PID: "+str(bf_PIDValue)
+                self.logFileWrite(logFileCmd,"bf_PID: "+str(bf_PIDValue))
                 
                 self.logFileWrite(logFilePID,str(x_PIDValue))
             # Actuate
