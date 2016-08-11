@@ -20,8 +20,6 @@ def cornerPointsChess(img):
     gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY) 
     ret, corners = cv2.findChessboardCorners(gray, (NBR_COLUMNS,NBR_ROWS),None)
     
-#    print corners
-    
     xalt=[]
     yalt=[]
     sumV=[]
@@ -53,7 +51,7 @@ def cornerPointsChess(img):
     
         # Draw and display the corners (ADD FRAMES)
         cv2.drawChessboardCorners(img, (NBR_COLUMNS,NBR_ROWS), corners,ret)
-        print "Print image"
+#        Draw ideal frame in the middle
 
     else:
         print "Chessboard not found!"
