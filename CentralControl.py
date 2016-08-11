@@ -74,9 +74,9 @@ class CentralControl(object):
         drone.takeoff()
         print "Takeoff"
         
-        logFilePIDPath="logFilePID.log"
+        logFilePIDPath="logFilePID_02.log"
         logFilePID=open(logFilePIDPath,"a")
-        logFileCmdPath="logFileCmd.log"
+        logFileCmdPath="logFileCmd_02.log"
         logFileCmd=open(logFileCmdPath,"a")
 
         logFilePID.write("\n\n=================================================================================\n")
@@ -87,6 +87,7 @@ class CentralControl(object):
         while counter<3000:#running:
             key=cv2.waitKey(5)
             if key==32:
+                print "Land drone"
                 drone.land()
             
             frame=drone.get_image()
