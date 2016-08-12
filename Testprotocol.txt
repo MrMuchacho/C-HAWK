@@ -11,3 +11,9 @@ Gute Steuerug im Allgemeinen
     maxPIDValue = [200,200,200,200]
     x_offset=0.003
 Relativ stabiles und schnelles Verhalten
+
+##########################
+    speedRange = [0.45,0.15,0.45,0.1]  #turn x, move y, go forward, move x      ## Stabile Werte [0.25,0.15,0.2,0.05]
+    maxPIDValue = [200,200,200,200]
+    x_offset=0.003
+Gutes Verhalten, wurde nur manchmal nicht getrackt

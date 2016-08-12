@@ -17,7 +17,7 @@ class CentralControl(object):
     y_PIDController=PID_Controller(1.5,0.0,2.25,"yController")
     bf_PIDController=PID_Controller(1,0.0,3,"bfController")
     
-    speedRange = [0.35,0.15,0.3,0.1]  #turn x, move y, go forward, move x      ## Stabile Werte [0.25,0.15,0.2,0.05]
+    speedRange = [0.45,0.15,0.375,0.1]  #turn x, move y, go forward, move x      ## Stabile Werte [0.25,0.15,0.2,0.05]
     maxPIDValue = [200,200,200,200]
     x_offset=0.003
     
@@ -106,11 +106,11 @@ class CentralControl(object):
                 x_PIDValue=self.x_PIDController.pidControl(self.standardXCoord,xAvg)
                 y_PIDValue=self.y_PIDController.pidControl(self.standardYCoord,yAvg)
                 bf_PIDValue=self.bf_PIDController.pidControl(self.standardSize,recipSize)
-                print "x_PID: "+str(x_PIDValue)
+#                print "x_PID: "+str(x_PIDValue)
                 self.logFileWrite(logFileCmd,"x_PID: "+str(x_PIDValue))
-                print "y_PID: "+str(y_PIDValue)
+#                print "y_PID: "+str(y_PIDValue)
                 self.logFileWrite(logFileCmd,"y_PID: "+str(y_PIDValue))
-                print "bf_PID: "+str(bf_PIDValue)
+#                print "bf_PID: "+str(bf_PIDValue)
                 self.logFileWrite(logFileCmd,"bf_PID: "+str(bf_PIDValue))
                 
                 self.logFileWrite(logFilePID,str(x_PIDValue)+","+str(y_PIDValue)+","+str(bf_PIDValue))
@@ -206,11 +206,12 @@ class CentralControl(object):
         
         
     def actuateAll(self,x2Speed,xSpeed,ySpeed,bfSpeed,drone):
-        print "z-Speed:"+str(-bfSpeed)+", x-Speed: "+str(xSpeed)+", y-Speed: "+str(ySpeed)
+#        print "z-Speed:"+str(-bfSpeed)+", x-Speed: "+str(xSpeed)+", y-Speed: "+str(ySpeed)
         drone.at(libardrone.at_pcmd, True, x2Speed+self.x_offset, bfSpeed, ySpeed, xSpeed)
        
     def logFileWrite(self,file,msg):
-        file.write("%s,%s\n" % (str(time.time()), msg))
+        pass
+#        file.write("%s,%s\n" % (str(time.time()), msg))
         
   #  logfile = '/var/log/logfile.log'
 

@@ -10,7 +10,8 @@ import cv2
 import time
 
 def logFileWrite(file,msg):
-        file.write("%s,%s\n" % (str(time.time()), msg))
+    pass
+#        file.write("%s,%s\n" % (str(time.time()), msg))
 
 def cornerPointsChess(img,logFile):
     """Find chessboard in image
@@ -19,8 +20,8 @@ def cornerPointsChess(img,logFile):
         img: An openCV image ndarray in a grayscale or color format.
         logFile: File handler for logfile.
     """
-    NBR_COLUMNS = 5
-    NBR_ROWS = 5
+    NBR_COLUMNS = 3
+    NBR_ROWS = 3
     
     gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY) 
     ret, corners = cv2.findChessboardCorners(gray, (NBR_COLUMNS,NBR_ROWS),None)
@@ -30,7 +31,7 @@ def cornerPointsChess(img,logFile):
     sumV=[]
     
     if ret == True:
-        print "Chessboard found!"
+#        print "Chessboard found!"
         logFileWrite(logFile,"Chessboard found!")
         cv2.imwrite('testewr.png',img)
         #Find left-top corner value && right-bottom corner value
@@ -46,7 +47,7 @@ def cornerPointsChess(img,logFile):
             sumV.append(xalt[i] + yalt[i])
         minV = min(sumV)
         maxV = max(sumV)
-        print "Sum: "+str(sumV)
+#        print "Sum: "+str(sumV)
         logFileWrite(logFile,"Sum: "+str(sumV))
         for i in range(0, 4):
             if minV==sumV[i]:
@@ -54,7 +55,7 @@ def cornerPointsChess(img,logFile):
             if maxV==sumV[i]:
                 x2 = xalt[i]; y2 = yalt[i]
         
-        print "Endpoints: ("+str(x1)+","+str(y1)+") ; ("+str(x2)+","+str(y2)+")"
+#        print "Endpoints: ("+str(x1)+","+str(y1)+") ; ("+str(x2)+","+str(y2)+")"
         logFileWrite(logFile,"Endpoints: ("+str(x1)+","+str(y1)+") ; ("+str(x2)+","+str(y2)+")")
         # Draw and display the corners (ADD FRAMES)
         cv2.drawChessboardCorners(img, (NBR_COLUMNS,NBR_ROWS), corners,ret)
