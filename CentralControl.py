@@ -12,26 +12,14 @@ import cv2
 import numpy as np
 
 class CentralControl(object):
-    
+    # Controller parameter
     x_PIDController=PID_Controller(1,0.0,2.5,"xController")
     y_PIDController=PID_Controller(1.5,0.0,2.25,"yController")
     bf_PIDController=PID_Controller(1,0.0,3,"bfController")
-    
-    speedRange = [0.45,0.15,0.375,0.1]  #turn x, move y, go forward, move x      ## Stabile Werte [0.25,0.15,0.2,0.05]
+    speedRange = [0.45,0.15,0.375,0.1]  #turn x, move y, go forward, move x      ## Stable values [0.25,0.15,0.2,0.05]
     maxPIDValue = [200,200,200,200]
     x_offset=0.003
     
-    #imgrecognition class
-    
-    #actuator class?
-    
-    
-    
-#    standardSize=2
-#    standardXCoordLU=22
-#    standardYCoordLU=22
-#    standardXCoordRD=22 #wird wahrscheinlich nicht gebraucht
-#    standardYCoordRD=22 #wird wahrscheinlich nicht gebraucht
     
     def __init__(self,standardXCoord,standardYCoord,standardSize):
         self.standardXCoord=standardXCoord
@@ -53,25 +41,12 @@ class CentralControl(object):
     def controlLoop(self):
         drone=libardrone.ARDrone(True)        
         drone.reset()
-#        drone.speed = 0.1
-#        waiting = True
 
-#        while waiting:
-#            key=cv2.waitKey(1000)
-#            if key==32:
-#                waiting = False
-#                print "End Waiting"  
-#                 
-#            else:
-#                print "Waiting"
-#                print "Key: "+str(key)
-#                time.sleep(1)
         frame=drone.get_image()
         cv2.imshow('img',frame)
-        print "Draw Image"
+        #Wait for any key to start over
         cv2.waitKey(0)
         
-#        print "Key: "+str(key)
         drone.takeoff()
         print "Takeoff"
         
@@ -80,12 +55,12 @@ class CentralControl(object):
         logFileCmdPath="logFileCmd_11.csv"
         logFileCmd=open(logFileCmdPath,"a")
 
-#        logFilePID.write("\n\n=================================================================================\n")
+        logFilePID.write("\n\n=================================================================================\n")
         logFileCmd.write("\n\n=================================================================================\n")
         
         running=True
-        #counter=0
-        while running:#counter<3000:#running:
+
+        while running:
             key=cv2.waitKey(5)
             if key==32:
                 print "Land drone"
@@ -94,50 +69,35 @@ class CentralControl(object):
             
             frame=drone.get_image()
             
-        # call imageRec
+            # call imageRec
             xlu,ylu,xrd,yrd=patternRecognition.cornerPointsChess(frame,logFileCmd)
             if not(xlu==-1 and ylu==-1 and xrd==-1 and yrd==-1):    
-            # computeSize
+                # computeSize
                 currentsize=self.computeSize(xlu,ylu,xrd,yrd)
                 recipSize = self.reciprocalSize(self.standardSize,currentsize)
                 xAvg = (xlu+xrd)/2.0
                 yAvg = (ylu+yrd)/2.0
-            # call PIDController
+                # call PIDController
                 x_PIDValue=self.x_PIDController.pidControl(self.standardXCoord,xAvg)
                 y_PIDValue=self.y_PIDController.pidControl(self.standardYCoord,yAvg)
                 bf_PIDValue=self.bf_PIDController.pidControl(self.standardSize,recipSize)
-#                print "x_PID: "+str(x_PIDValue)
+                #log-file entries
                 self.logFileWrite(logFileCmd,"x_PID: "+str(x_PIDValue))
-#                print "y_PID: "+str(y_PIDValue)
                 self.logFileWrite(logFileCmd,"y_PID: "+str(y_PIDValue))
-#                print "bf_PID: "+str(bf_PIDValue)
-                self.logFileWrite(logFileCmd,"bf_PID: "+str(bf_PIDValue))
-                
+                self.logFileWrite(logFileCmd,"bf_PID: "+str(bf_PIDValue))              
                 self.logFileWrite(logFilePID,str(x_PIDValue)+","+str(y_PIDValue)+","+str(bf_PIDValue))
-            # Actuate
-                maxPIDValue = max(abs(x_PIDValue),abs(y_PIDValue),abs(bf_PIDValue))
-#                self.actuateX(x_PIDValue,drone)
-#                if abs(x_PIDValue)==abs(maxPIDValue):
-#                    self.actuateX(x_PIDValue,drone)
-#                elif abs(y_PIDValue)==abs(maxPIDValue):
-#                    self.actuateY(y_PIDValue,drone)
-#                else:
-#                    self.actuateBF(bf_PIDValue,drone)
-                    
+                # Actuate                 
                 xSpeed,ySpeed,bfSpeed,x2Speed = self.calcSpeed(x_PIDValue,y_PIDValue,bf_PIDValue)
                 self.actuateAll(x2Speed,xSpeed,ySpeed,bfSpeed,drone)
             else:
                 drone.hover()
                 pass
             
-            #counter+=1
-            
             time.sleep(0.01)
             
-
+        #Close log-files
         logFilePID.close    
-        logFileCmd.close
-        #drone.land()    
+        logFileCmd.close  
         print "Drone landed"     
          
         print("Shutting down...")
@@ -206,29 +166,15 @@ class CentralControl(object):
         
         
     def actuateAll(self,x2Speed,xSpeed,ySpeed,bfSpeed,drone):
-#        print "z-Speed:"+str(-bfSpeed)+", x-Speed: "+str(xSpeed)+", y-Speed: "+str(ySpeed)
         drone.at(libardrone.at_pcmd, True, x2Speed+self.x_offset, bfSpeed, ySpeed, xSpeed)
        
     def logFileWrite(self,file,msg):
         pass
 #        file.write("%s,%s\n" % (str(time.time()), msg))
         
-  #  logfile = '/var/log/logfile.log'
-
-## function to save log messages to specified log file
-#def log(msg):
-#
-#  # open the specified log file
-#  file = open(logfile,"a")
-#
-#  # write log message with timestamp to log file
-#  file.write("%s: %s\n" % (time.strftime("%d.%m.%Y %H:%M:%S"), msg))
-#
-#  # close log file
-#  file.close
 
 
-control=CentralControl(320,180,80)     #115
+control=CentralControl(320,180,80)     #Parameter of ideal position (x,y and z direction [px])
 control.controlLoop()
         
         

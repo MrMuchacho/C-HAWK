@@ -14,7 +14,6 @@ class PID_Controller(object):
     k_d=1
     
     sum_value_difference=0
-#    old_value_difference=0
     old_value=-1
     old_time=-1
     kind_of_controller='Default'
@@ -35,14 +34,12 @@ class PID_Controller(object):
         if self.old_value==-1:
             y_d = 0
             self.old_value = actualValue
-            self.old_time = int(round(time.time() * 1000/250))
+            self.old_time = int(round(time.time() * 1000/250))  #time in number of frames 
         else:
             actual_time = int(round(time.time() * 1000/250))
             y_d = self.k_d*(self.old_value-actualValue)
             self.old_value = actualValue
             self.old_time = actual_time
-#        y_d=self.old_value_difference-valueDifferenz
-#        self.old_value_difference=valueDifferenz
         
         return y_p+y_i+y_d
     

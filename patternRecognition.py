@@ -4,10 +4,7 @@
 
 This file provides functions to find well-defined patterns in an image
 """
-
-import numpy as np
 import cv2
-import time
 
 def logFileWrite(file,msg):
     pass
@@ -47,7 +44,6 @@ def cornerPointsChess(img,logFile):
             sumV.append(xalt[i] + yalt[i])
         minV = min(sumV)
         maxV = max(sumV)
-#        print "Sum: "+str(sumV)
         logFileWrite(logFile,"Sum: "+str(sumV))
         for i in range(0, 4):
             if minV==sumV[i]:
@@ -55,14 +51,11 @@ def cornerPointsChess(img,logFile):
             if maxV==sumV[i]:
                 x2 = xalt[i]; y2 = yalt[i]
         
-#        print "Endpoints: ("+str(x1)+","+str(y1)+") ; ("+str(x2)+","+str(y2)+")"
         logFileWrite(logFile,"Endpoints: ("+str(x1)+","+str(y1)+") ; ("+str(x2)+","+str(y2)+")")
         # Draw and display the corners (ADD FRAMES)
         cv2.drawChessboardCorners(img, (NBR_COLUMNS,NBR_ROWS), corners,ret)
-#        Draw ideal frame in the middle
 
     else:
-        print "Chessboard not found!"
         logFileWrite(logFile,"Chessboard not found!")
         x1=-1; y1=-1; x2=-1; y2=-1
         
