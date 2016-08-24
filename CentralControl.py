@@ -5,35 +5,26 @@ Created on Wed Aug 10 11:48:48 2016
 @author: Christian
 """
 from PIDController import PID_Controller
-import libardrone
-import patternRecognition
+from libardrone import libardrone
+import patternRecognition 
+import time
+import cv2
+import numpy as np
 
 class CentralControl(object):
-    
-    x_PIDController=PID_Controller(1,1,1,"xController")
-    y_PIDController=PID_Controller(1,1,1,"yController")
-    bf_PIDController=PID_Controller(1,1,1,"bfController")
-    
-    drone=libardrone.ARDrone(True)
-    
-    #imgrecognition class
-    
-    #actuator class?
+    # Controller parameter
+    x_PIDController=PID_Controller(1,0.0,2.5,"xController")
+    y_PIDController=PID_Controller(1.5,0.0,2.25,"yController")
+    bf_PIDController=PID_Controller(1,0.0,3,"bfController")
+    speedRange = [0.45,0.15,0.375,0.1]  #turn x, move y, go forward, move x      ## Stable values [0.25,0.15,0.2,0.05]
+    maxPIDValue = [200,200,200,200]
+    x_offset=0.003
     
     
-    
-#    standardSize=2
-#    standardXCoordLU=22
-#    standardYCoordLU=22
-#    standardXCoordRD=22 #wird wahrscheinlich nicht gebraucht
-#    standardYCoordRD=22 #wird wahrscheinlich nicht gebraucht
-    
-    def __init__(self,standardXCoordLU,standardYCoordLU,standardXCoordRD,standardYCoordRD):
-        self.standardXCoordLU=standardXCoordLU
-        self.standardYCoordLU=standardYCoordLU
-        self.standardXCoordRD=standardXCoordRD
-        self.standardYCoordRD=standardYCoordRD
-        self.standardSize=self.computeSize(standardXCoordLU,standardYCoordLU,standardXCoordRD,standardYCoordRD)
+    def __init__(self,standardXCoord,standardYCoord,standardSize):
+        self.standardXCoord=standardXCoord
+        self.standardYCoord=standardYCoord
+        self.standardSize=standardSize
         
     
     #Image Recognition returns left upper corner coordinates and right downer corner coordinates
@@ -41,46 +32,150 @@ class CentralControl(object):
     def computeSize(self,xCoordinate_leftUpperCorner,yCoordinate_leftUpperCorner,xCoordinate_rightDownerCorner,yCoordinate_rightDownerCorner):
         return ((xCoordinate_leftUpperCorner-xCoordinate_rightDownerCorner)**2+(yCoordinate_leftUpperCorner-yCoordinate_rightDownerCorner)**2)**0.5
     
+    def reciprocalSize(self,desiredValue,actualValue):
+        if actualValue<desiredValue:
+            return 2*desiredValue-(desiredValue**2)/actualValue
+        else:
+            return actualValue
+    
     def controlLoop(self):
-        self.drone.reset()
+        drone=libardrone.ARDrone(True)        
+        drone.reset()
+
+        frame=drone.get_image()
+        cv2.imshow('img',frame)
+        #Wait for any key to start over
+        cv2.waitKey(0)
         
-        self.drone.takeoff()
+        drone.takeoff()
+        print "Takeoff"
+        
+        logFilePIDPath="logFilePID_11.csv"
+        logFilePID=open(logFilePIDPath,"a")
+        logFileCmdPath="logFileCmd_11.csv"
+        logFileCmd=open(logFileCmdPath,"a")
+
+        logFilePID.write("\n\n=================================================================================\n")
+        logFileCmd.write("\n\n=================================================================================\n")
         
         running=True
+
         while running:
-            frame=self.drone.get_image()
+            key=cv2.waitKey(5)
+            if key==32:
+                print "Land drone"
+                running=False
+                drone.land()
             
-        # call imageRec
-            xlu,ylu,xrd,yrd=patternRecognition.cornerPointsChess(frame)
-        # computeSize
-            currentsize=self.computeSize(xlu,ylu,xrd,yrd)
-        # call PIDController
-            x_PIDValue=self.x_PIDController.pidControl(self.standardXCoordLU,xlu)
-            y_PIDValue=self.y_PIDController.pidControl(self.standardYCoordLU,ylu)
-            bf_PIDValue=self.bf_PIDController.pidControl(self.standardSize,currentsize)
-        # Actuate
-            self.actuateX(x_PIDValue)
-            self.actuateY(y_PIDValue)
-            self.actuateBF(bf_PIDValue)
+            frame=drone.get_image()
+            
+            # call imageRec
+            xlu,ylu,xrd,yrd=patternRecognition.cornerPointsChess(frame,logFileCmd)
+            if not(xlu==-1 and ylu==-1 and xrd==-1 and yrd==-1):    
+                # computeSize
+                currentsize=self.computeSize(xlu,ylu,xrd,yrd)
+                recipSize = self.reciprocalSize(self.standardSize,currentsize)
+                xAvg = (xlu+xrd)/2.0
+                yAvg = (ylu+yrd)/2.0
+                # call PIDController
+                x_PIDValue=self.x_PIDController.pidControl(self.standardXCoord,xAvg)
+                y_PIDValue=self.y_PIDController.pidControl(self.standardYCoord,yAvg)
+                bf_PIDValue=self.bf_PIDController.pidControl(self.standardSize,recipSize)
+                #log-file entries
+                self.logFileWrite(logFileCmd,"x_PID: "+str(x_PIDValue))
+                self.logFileWrite(logFileCmd,"y_PID: "+str(y_PIDValue))
+                self.logFileWrite(logFileCmd,"bf_PID: "+str(bf_PIDValue))              
+                self.logFileWrite(logFilePID,str(x_PIDValue)+","+str(y_PIDValue)+","+str(bf_PIDValue))
+                # Actuate                 
+                xSpeed,ySpeed,bfSpeed,x2Speed = self.calcSpeed(x_PIDValue,y_PIDValue,bf_PIDValue)
+                self.actuateAll(x2Speed,xSpeed,ySpeed,bfSpeed,drone)
+            else:
+                drone.hover()
+                pass
+            
+            time.sleep(0.01)
+            
+        #Close log-files
+        logFilePID.close    
+        logFileCmd.close  
+        print "Drone landed"     
+         
+        print("Shutting down...")
+        drone.halt()
+        print("Ok.")
+            
+        
+    def actuateX(self, x_PIDValue,drone):
+        drone.speed = 0.1
+        if x_PIDValue>0:
+            print "Turn left"
+            drone.turn_left()
+        elif x_PIDValue<0:
+            print "Turn right"
+            drone.turn_right()
+        else:
+            pass
+        time.sleep(0.1)
 
-    drone.land()    
-    print "Drone landed"     
-     
-    print("Shutting down...")
-    drone.halt()
-    print("Ok.")
+    def actuateY(self, y_PIDValue,drone):
+        drone.speed = 0.1
+        if y_PIDValue>0:
+            print "Move up"
+            drone.move_up()
+        elif y_PIDValue<0:
+            print "Move down"
+            drone.move_down()
+        else:
+            pass
+        time.sleep(0.1)
         
-        
-    def actuateX(self, x_PIDValue):
-        pass
+    def actuateBF(self, bf_PIDValue,drone):
+        drone.speed = 0.1
+        if bf_PIDValue>0:
+            print "Move forward"
+            drone.move_forward()
+        elif bf_PIDValue<0:
+            print "Move backward"
+            drone.move_backward()
+        else:
+            pass
+        time.sleep(0.1)
 
-    def actuateY(self, y_PIDValue):
+    def calcSpeed(self,x_PIDValue,y_PIDValue,bf_PIDValue):
+        # x-speed: change sign PIDValue>0 <=> speed<0
+        if abs(x_PIDValue)>self.maxPIDValue[0]:        
+            xSpeed=-np.sign(x_PIDValue)*self.speedRange[0]
+        else:
+            xSpeed=-x_PIDValue/self.maxPIDValue[0]*self.speedRange[0]
+        # y-speed: keep sign PIDValue>0 <=> speed>0
+        if abs(y_PIDValue)>self.maxPIDValue[1]:        
+            ySpeed=np.sign(y_PIDValue)*self.speedRange[1]
+        else:
+            ySpeed=y_PIDValue/self.maxPIDValue[1]*self.speedRange[1]
+        # bf-speed: change sign PIDValue>0 <=> speed<0
+        if abs(bf_PIDValue)>self.maxPIDValue[2]:        
+            bfSpeed=-np.sign(bf_PIDValue)*self.speedRange[2]
+        else:
+            bfSpeed=-bf_PIDValue/self.maxPIDValue[2]*self.speedRange[2]
+        # x-speed: change sign PIDValue>0 <=> speed<0
+        if abs(x_PIDValue)>self.maxPIDValue[3]:        
+            x2Speed=-np.sign(x_PIDValue)*self.speedRange[3]
+        else:
+            x2Speed=-x_PIDValue/self.maxPIDValue[3]*self.speedRange[3]
+        return xSpeed,ySpeed,bfSpeed,x2Speed
+        
+        
+    def actuateAll(self,x2Speed,xSpeed,ySpeed,bfSpeed,drone):
+        drone.at(libardrone.at_pcmd, True, x2Speed+self.x_offset, bfSpeed, ySpeed, xSpeed)
+       
+    def logFileWrite(self,file,msg):
         pass
+#        file.write("%s,%s\n" % (str(time.time()), msg))
         
-    def actuateBF(self, bf_PIDValue):
-        pass
-        
-        
+
+
+control=CentralControl(320,180,80)     #Parameter of ideal position (x,y and z direction [px])
+control.controlLoop()
         
         
     
