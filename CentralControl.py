@@ -104,42 +104,6 @@ class CentralControl(object):
         drone.halt()
         print("Ok.")
             
-        
-    def actuateX(self, x_PIDValue,drone):
-        drone.speed = 0.1
-        if x_PIDValue>0:
-            print "Turn left"
-            drone.turn_left()
-        elif x_PIDValue<0:
-            print "Turn right"
-            drone.turn_right()
-        else:
-            pass
-        time.sleep(0.1)
-
-    def actuateY(self, y_PIDValue,drone):
-        drone.speed = 0.1
-        if y_PIDValue>0:
-            print "Move up"
-            drone.move_up()
-        elif y_PIDValue<0:
-            print "Move down"
-            drone.move_down()
-        else:
-            pass
-        time.sleep(0.1)
-        
-    def actuateBF(self, bf_PIDValue,drone):
-        drone.speed = 0.1
-        if bf_PIDValue>0:
-            print "Move forward"
-            drone.move_forward()
-        elif bf_PIDValue<0:
-            print "Move backward"
-            drone.move_backward()
-        else:
-            pass
-        time.sleep(0.1)
 
     def calcSpeed(self,x_PIDValue,y_PIDValue,bf_PIDValue):
         # x-speed: change sign PIDValue>0 <=> speed<0
