@@ -1,4 +1,4 @@
-#C-HAWK
+# C-HAWK
 
 This drone control mainly uses the libraries OpenCV and [libardrone](https://github.com/venthur/python-ardrone/blob/master/libardrone.py).
 The drone will follow a chessboard. For this function the [chessboard recognition](http://opencv-python-tutroals.readthedocs.io/en/latest/py_tutorials/py_calib3d/py_calibration/py_calibration.html) from OpenCV is used.
@@ -9,7 +9,7 @@ Thereby three "directions" are optimised:
  * y-coordinate -> height-control
  * length of diagonale -> backwards/forwards-control
 
-##To run the program:
+## To run the program:
 You have to download the GitHub project brandneb/python-ardrone.
 Then put the files from this project into the libardrone folder.
 Connect your laptop to the drone and run CentralControl.py.
