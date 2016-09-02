@@ -28,7 +28,7 @@ For landing and shutting down the drone press space.
 * Testprotocol.txt: some example values for speed settings which worked well
 * patternRecognition.py:
     + //missing description
-    +
+    + 
 * schachbrettmuster.jpg: example chessboard (the code expects this chessboard, but you can configure patternRecognition.py if you want to use another chessboard size)
 * schachmuster_5x5.jpg: example chessboard
 
