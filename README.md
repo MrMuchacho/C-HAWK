@@ -17,12 +17,12 @@ For takeoff press any key.
 Now the drone should try to follow the chessboard.
 For landing and shutting down the drone press space.
 
-## Overview over the included files
-* CentralControl.py ->
-* PIDController.py  ->
-* Testprotocol.txt  ->
-* patternRecognition.py ->
-* schachbrettmuster.jpg ->
-* schachmuster_5x5.jpg  ->
+## Overview over the included files:
+* CentralControl.py: 
+* PIDController.py: a normal implementation of a PID-Controller where the constants are set via parameters
+* Testprotocol.txt: some example values for speed settings which worked well
+* patternRecognition.py:
+* schachbrettmuster.jpg: example image
+* schachmuster_5x5.jpg: example image
 
 Authors: Christian Gebhardt and Christian Münch
