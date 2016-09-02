@@ -21,15 +21,15 @@ For landing and shutting down the drone press space.
 ## Overview over the included files:
 * CentralControl.py:
     + the drone is started
-    + the values of the patternRecognition are received, interpreted and given to the three PD-Controllers
-    + the values of the PD-Controllers are interpreted and used to calculate the speeds and directions for actuating the desired movements
+    + values of the patternRecognition are received, interpreted and given to the three PD-Controllers
+    + values of the PD-Controllers are received, interpreted and used to calculate the speeds and directions for actuating the desired movements
     + the drone is landed and shut down
 * PIDController.py: a normal implementation of a PID-Controller where the constants are set via parameters
 * Testprotocol.txt: some example values for speed settings which worked well
 * patternRecognition.py:
     + //missing description
     + 
-* schachbrettmuster.jpg: example chessboard (the code expects this chessboard, but you can configure patternRecognition.py if you want to use another chessboard size)
+* schachbrettmuster.jpg: example chessboard (the code expects this chessboard size, but you can configure patternRecognition.py if you want to use another chessboard size)
 * schachmuster_5x5.jpg: example chessboard
 
 **_Authors:_** Christian Gebhardt and Christian Münch
