@@ -14,16 +14,20 @@ You have to download the GitHub project [libardrone](https://github.com/venthur/
 Then put the files from this project into the libardrone folder.
 Connect your laptop to the drone and run CentralControl.py.
 For takeoff press any key. 
+You should be able to see the front camera livestream and if the drone detects a chessboard, you will see a marking in the livestream.
 Now the drone should try to follow the chessboard.
 For landing and shutting down the drone press space.
 
 ## Overview over the included files:
-* CentralControl.py: 
+* CentralControl.py:
+    + the drone is started
+    + the values of the patternRecognition are received, interpreted and given to the three PD-Controllers
+    + the values of the PD-Controllers are interpreted and used to calculate the speeds and directions for actuating the desired movements
+    + 
 * PIDController.py: a normal implementation of a PID-Controller where the constants are set via parameters
 * Testprotocol.txt: some example values for speed settings which worked well
 * patternRecognition.py:
-* schachbrettmuster.jpg: example chessboard (the code expects this chessboard, but you can configure 
-                          patternRecognition.py if you want to use another chessboard size)
+* schachbrettmuster.jpg: example chessboard (the code expects this chessboard, but you can configure patternRecognition.py if you want to use another chessboard size)
 * schachmuster_5x5.jpg: example chessboard
 
 **_Authors:_** Christian Gebhardt and Christian Münch
