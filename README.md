@@ -25,4 +25,4 @@ For landing and shutting down the drone press space.
 * schachbrettmuster.jpg: example image
 * schachmuster_5x5.jpg: example image
 
-_Authors:_ Christian Gebhardt and Christian Münch
+__Authors:__ Christian Gebhardt and Christian Münch
