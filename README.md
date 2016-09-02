@@ -1,6 +1,6 @@
 # C-HAWK
 
-This drone control mainly uses the libraries OpenCV and [libardrone](https://github.com/venthur/python-ardrone/blob/master/libardrone.py).
+This drone control mainly uses the libraries OpenCV and [libardrone](https://github.com/venthur/python-ardrone).
 The drone will follow a chessboard. For this function the [chessboard recognition](http://opencv-python-tutroals.readthedocs.io/en/latest/py_tutorials/py_calib3d/py_calibration/py_calibration.html) from OpenCV is used.
 After the drone has detected the chessboard, it computes the middlw of the board and the length of the diagonal of the board.
 These informations are put into three different PD-Controler.
