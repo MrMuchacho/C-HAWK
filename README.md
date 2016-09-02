@@ -5,9 +5,9 @@ The drone will follow a chessboard. For this function the [chessboard recognitio
 After the drone has detected the chessboard, it computes the middlw of the board and the length of the diagonal of the board.
 These informations are put into three different PD-Controler.
 Thereby three "directions" are optimised:
- * x-coordinate -> left/right-control
- * y-coordinate -> height-control
- * length of diagonale -> backwards/forwards-control
+* x-coordinate -> left/right-control
+* y-coordinate -> height-control
+* length of diagonale -> backwards/forwards-control
 
 ## To run the program:
 You have to download the GitHub project brandneb/python-ardrone.
