@@ -22,7 +22,8 @@ For landing and shutting down the drone press space.
 * PIDController.py: a normal implementation of a PID-Controller where the constants are set via parameters
 * Testprotocol.txt: some example values for speed settings which worked well
 * patternRecognition.py:
-* schachbrettmuster.jpg: example chessboard (the code expects this chessboard, but you can configure patternRecognition.py if you want to use another chessboard size)
+* schachbrettmuster.jpg: example chessboard (the code expects this chessboard, but you can configure 
+                          patternRecognition.py if you want to use another chessboard size)
 * schachmuster_5x5.jpg: example chessboard
 
 **_Authors:_** Christian Gebhardt and Christian Münch
