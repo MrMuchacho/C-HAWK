@@ -23,7 +23,7 @@ For landing and shutting down the drone press space.
     + the drone is started
     + the values of the patternRecognition are received, interpreted and given to the three PD-Controllers
     + the values of the PD-Controllers are interpreted and used to calculate the speeds and directions for actuating the desired movements
-    + 
+    + the drone is landed and shut down
 * PIDController.py: a normal implementation of a PID-Controller where the constants are set via parameters
 * Testprotocol.txt: some example values for speed settings which worked well
 * patternRecognition.py:
