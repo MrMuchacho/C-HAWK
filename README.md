@@ -28,7 +28,7 @@ For landing and shutting down the drone press space.
 * Testprotocol.txt: some example values for speed settings which worked well
 * patternRecognition.py:
     + function that detects a (n x m) chessboard in an image and returns the coordinates of the left upper corner and the right bottom corner
-    + the function uses the function 'findChessboardCorners' of the openCV library find the chessboard
+    + the function uses 'findChessboardCorners' of the openCV library to find the chessboard
     + the chessboard is marked in the original image and is shown in a seperate window
 * schachbrettmuster.jpg: example chessboard (the code expects this chessboard size, but you can configure patternRecognition.py if you want to use another chessboard size)
 * schachmuster_5x5.jpg: example chessboard
